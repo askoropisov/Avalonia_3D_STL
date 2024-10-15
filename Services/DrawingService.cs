@@ -1,17 +1,13 @@
-﻿using Avalonia.Input;
-using Avalonia.Rendering;
+﻿using Avalonia;
+using Avalonia.Input;
 using Avalonia_3D_STL.Helpers;
 using Avalonia_3D_STL.Interfaces;
 using Avalonia_3D_STL.Models._3D;
-using DynamicData.Tests;
 using Silk.NET.Maths;
 using Silk.NET.OpenGLES;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Avalonia_3D_STL.Services
 {
@@ -42,8 +38,8 @@ namespace Avalonia_3D_STL.Services
         private Renderer renderer = null!;
         private Camera camera = null!;
 
-        private Vector3D<float> cameraPosition = new Vector3D<float>(0.0f, 2.0f, 0.0f); // Начальная позиция камеры
-        private float cameraDistance = 5.0f; // Начальное расстояние до модели
+        private Vector3D<float> cameraPosition = new Vector3D<float>(50.0f, 0.0f, 120.0f); // Начальная позиция камеры
+        private float cameraDistance = 50.0f; // Начальное расстояние до модели
         private float cameraSpeed = 1f; // Скорость перемещения камеры
 
         #region Pipelines
@@ -52,7 +48,7 @@ namespace Avalonia_3D_STL.Services
         #endregion
 
         #region Meshes
-        private List<Figure> cubeMeshes = null!;
+        private List<Figure> Meshes = null!;
         #endregion
 
         private Matrix4X4<float> model = Matrix4X4<float>.Identity;
@@ -75,7 +71,7 @@ namespace Avalonia_3D_STL.Services
             solidColorPipeline = new RenderPipeline(renderer, vs2, fs2);
 
             STL_Reader.GetModel(out List<Vertex> vertices, out List<uint> indices);
-            cubeMeshes = [new(renderer, vertices, indices)];
+            Meshes = [new(renderer, vertices, indices)];
         }
 
         public void Update(double deltaSeconds)
@@ -83,7 +79,7 @@ namespace Avalonia_3D_STL.Services
             camera.Position = cameraPosition;
 
             //Обновление и вращение модели по времени deltaSec
-            model = Matrix4X4.CreateFromAxisAngle(new Vector3D<float>(0.0f, 0.0f, 0.0f), 0);
+            //model = Matrix4X4.CreateFromAxisAngle(new Vector3D<float>(0.0f, 0.0f, 0.0f), 0);
 
             camera.Width = (int)renderer.Bounds.Width;
             camera.Height = (int)renderer.Bounds.Height;
@@ -99,7 +95,7 @@ namespace Avalonia_3D_STL.Services
             {
                 Matrix4X4<float> m = model * Matrix4X4.CreateTranslation(new Vector3D<float>(0.0f, 0.0f, 0.0f));
 
-                foreach (Figure mesh in cubeMeshes)
+                foreach (Figure mesh in Meshes)
                 {
                     solidColorPipeline.Bind();
 
@@ -107,7 +103,7 @@ namespace Avalonia_3D_STL.Services
                     {
                         Model = m,
                         View = camera.View,
-                        Projection = camera.Projection,
+                        //Projection = camera.Projection,
                         ObjectToWorld = m,
                         ObjectToClip = m * camera.View * camera.Projection,
                     });
@@ -144,13 +140,46 @@ namespace Avalonia_3D_STL.Services
                 case Key.D:
                     cameraPosition.X -= cameraSpeed * 10;
                     break;
-                case Key.LeftShift:
-                    cameraPosition.Z -= cameraSpeed * 10;
-                    break;
-                case Key.LeftCtrl:
-                    cameraPosition.Z += cameraSpeed * 10;
-                    break;
             }
+        }
+
+        private Point StartPoint { get; set; }
+        private Point FinishPoint { get; set; }
+
+        private bool IsPressed { get; set; }
+
+        public void PressMouseButton(object? sender, PointerPressedEventArgs e)
+        {
+            var posX = e.GetCurrentPoint(null).Position.X;
+            var posY = e.GetCurrentPoint(null).Position.Y;
+
+            IsPressed = true;
+            StartPoint = e.GetPosition(null);
+        }
+
+        public void MoveMouseButton(object? sender, PointerEventArgs e)
+        {
+            var t = e.GetCurrentPoint(null).Position;
+
+            if (IsPressed)
+            {
+                var P = t - StartPoint;
+                //model = Matrix4X4.CreateFromAxisAngle(new Vector3D<float>((float)P.Y / 10, 0f, 0f), 0.1f);
+                model = Matrix4X4.CreateFromYawPitchRoll((float)P.X / 100, (float)P.Y / 100, 0f);
+            }
+        }
+
+        public void ReleasedMouseButton(object? sender, PointerReleasedEventArgs e)
+        {
+            StartPoint = e.GetPosition(null);
+
+            IsPressed = false;
+        }
+
+        public void WheelMouse(object? sender, PointerWheelEventArgs e)
+        {
+            if (e.Delta.Y > 0) cameraPosition.Z -= cameraSpeed * 10;
+            else cameraPosition.Z += cameraSpeed * 10;
         }
     }
 }

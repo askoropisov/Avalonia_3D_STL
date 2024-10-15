@@ -80,7 +80,7 @@ namespace Avalonia_3D_STL.Helpers
                             triangle.Position[j].Z = reader.ReadSingle();
                         }
 
-                        // Пропускаем атрибуты (2 байта)
+                        // Пропускаем атрибуты (2 байта) - данные о цвете треугольника
                         reader.ReadUInt16();
 
                         triangles.Add(triangle);

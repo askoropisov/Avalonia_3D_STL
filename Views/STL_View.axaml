@@ -9,13 +9,15 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
 
-    <UniformGrid>
-        <Grid Margin="4">
-            <openGL:Renderer x:Name="glRenderer1" />
+    <Button
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        Content="t">
+        <UniformGrid>
+            <Grid Margin="4">
+                <openGL:Renderer x:Name="glRenderer1" />
 
-            <TextBlock Foreground="White" Text="Graphics Api Blender C#" Margin="10,10,0,0" />
-
-            <Button Content="Button" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Grid>
-    </UniformGrid>
+            </Grid>
+        </UniformGrid>
+    </Button>
 </UserControl>

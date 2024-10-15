@@ -20,5 +20,10 @@ public partial class STL_View : UserControl
         glRenderer1.OnUpdate += _drawingService1.Update;
         glRenderer1.OnRender += _drawingService1.Render;
         KeyDown += _drawingService1.KeyReader;
+
+        PointerPressed += _drawingService1.PressMouseButton;
+        PointerMoved += _drawingService1.MoveMouseButton;
+        PointerReleased += _drawingService1.ReleasedMouseButton;
+        PointerWheelChanged += _drawingService1.WheelMouse;
     }
 }

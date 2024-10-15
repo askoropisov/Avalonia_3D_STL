@@ -15,5 +15,9 @@ namespace Avalonia_3D_STL.Interfaces
 
         void Render(double deltaSeconds);
         void KeyReader(object? sender, KeyEventArgs e);
+        void PressMouseButton(object? sender, PointerPressedEventArgs e);
+        void MoveMouseButton(object? sender, PointerEventArgs e);
+        void ReleasedMouseButton(object? sender, PointerReleasedEventArgs e);
+        void WheelMouse(object? sender, PointerWheelEventArgs e);
     }
 }
