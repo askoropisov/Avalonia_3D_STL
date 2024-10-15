@@ -56,7 +56,7 @@ namespace Avalonia_3D_STL.Services
         #endregion
 
         private Matrix4X4<float> model = Matrix4X4<float>.Identity;
-        private Vector4D<float> color = new(0.0f, 1.0f, 0.0f, 0.5f);
+        private Vector4D<float> color = new(1f, 0.57f, 0.0f, 0.5f);
 
         public void Load(object[] args)
         {
@@ -65,12 +65,12 @@ namespace Avalonia_3D_STL.Services
             camera.Position = cameraPosition;
             camera.Fov = 250f;
 
-            using Models._3D.Shader vs1 = new(renderer, ShaderType.VertexShader, File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Resources", "Shaders", "Simple.vert")));
-            using Models._3D.Shader fs1 = new(renderer, ShaderType.FragmentShader, File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Resources", "Shaders", "Simple.frag")));
+            using Models._3D.Shader vs1 = new(renderer, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.vert"));
+            using Models._3D.Shader fs1 = new(renderer, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.frag"));
             simplePipeline = new RenderPipeline(renderer, vs1, fs1);
 
-            using Models._3D.Shader vs2 = new(renderer, ShaderType.VertexShader, File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Resources", "Shaders", "SolidColor.vert")));
-            using Models._3D.Shader fs2 = new(renderer, ShaderType.FragmentShader, File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Resources", "Shaders", "SolidColor.frag")));
+            using Models._3D.Shader vs2 = new(renderer, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\SolidColor.vert"));
+            using Models._3D.Shader fs2 = new(renderer, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\SolidColor.frag"));
 
             solidColorPipeline = new RenderPipeline(renderer, vs2, fs2);
 
@@ -93,7 +93,7 @@ namespace Avalonia_3D_STL.Services
         {
             GL gl = renderer.GetContext();
 
-            gl.ClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+            gl.ClearColor(0.52f, 0.74f, 0.8f, 0.6f);
             gl.Clear((uint)GLEnum.ColorBufferBit | (uint)GLEnum.DepthBufferBit | (uint)GLEnum.StencilBufferBit);
 
             {
@@ -133,22 +133,22 @@ namespace Avalonia_3D_STL.Services
             switch (e.Key)
             {
                 case Key.W:
-                    cameraPosition.Z -= cameraSpeed * 10;
+                    cameraPosition.Y -= cameraSpeed * 10;
                     break;
                 case Key.A:
-                    cameraPosition.X -= cameraSpeed * 10;
-                    break;
-                case Key.S:
-                    cameraPosition.Z += cameraSpeed * 10;
-                    break;
-                case Key.D:
                     cameraPosition.X += cameraSpeed * 10;
                     break;
-                case Key.LeftShift:
+                case Key.S:
                     cameraPosition.Y += cameraSpeed * 10;
                     break;
+                case Key.D:
+                    cameraPosition.X -= cameraSpeed * 10;
+                    break;
+                case Key.LeftShift:
+                    cameraPosition.Z -= cameraSpeed * 10;
+                    break;
                 case Key.LeftCtrl:
-                    cameraPosition.Y -= cameraSpeed * 10;
+                    cameraPosition.Z += cameraSpeed * 10;
                     break;
             }
         }

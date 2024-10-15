@@ -1,11 +1,8 @@
 ﻿using Avalonia_3D_STL.Models._3D;
 using Silk.NET.Maths;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Avalonia_3D_STL.Helpers
 {
@@ -16,7 +13,7 @@ namespace Avalonia_3D_STL.Helpers
 
             var parser = new StlBinaryParser();
             //var triangles = parser.Parse("C:\\Code\\3D\\OpenGLTest\\Assets\\Test.STL");
-            var triangles = parser.Parse(Path.Combine(AppContext.BaseDirectory, "Assets", "Test.STL"));
+            var triangles = parser.Parse("C:\\Code\\3D\\Avalonia_3D_STL\\Assets\\Test.STL");
             vertices = new List<Vertex>();
 
             foreach (var triangle in triangles)

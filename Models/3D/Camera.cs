@@ -1,10 +1,6 @@
 ﻿using Avalonia_3D_STL.Helpers;
 using Silk.NET.Maths;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Avalonia_3D_STL.Models._3D
 {

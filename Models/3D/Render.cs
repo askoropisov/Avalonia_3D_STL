@@ -55,8 +55,8 @@ namespace Avalonia_3D_STL.Models._3D
                 context ??= GL.GetApi(gl.GetProcAddress);
                 frame ??= new Frame(this);
 
-                using Shader vs = new(this, ShaderType.VertexShader, File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Assets", "Shaders", "Canvas.vert")));
-                using Shader fs = new(this, ShaderType.FragmentShader, File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Assets", "Shaders", "Canvas.frag")));
+                using Shader vs = new(this, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Canvas.vert"));
+                using Shader fs = new(this, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Canvas.frag"));
                 canvasPipeline = new RenderPipeline(this, vs, fs);
 
                 STL_Reader.GetCanvas(out List<Vertex> vertices, out List<uint> indices);
