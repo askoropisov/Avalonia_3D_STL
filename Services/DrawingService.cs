@@ -56,6 +56,7 @@ namespace Avalonia_3D_STL.Services
 
         public void Load(object[] args)
         {
+            STL_Reader reader = new STL_Reader();
             renderer = (Renderer)args[0];
             camera = new Camera();
             camera.Position = cameraPosition;
@@ -70,7 +71,7 @@ namespace Avalonia_3D_STL.Services
 
             solidColorPipeline = new RenderPipeline(renderer, vs2, fs2);
 
-            STL_Reader.GetModel(out List<Vertex> vertices, out List<uint> indices);
+            reader.GetModel(out List<Vertex> vertices, out List<uint> indices);
             Meshes = [new(renderer, vertices, indices)];
         }
 
@@ -89,7 +90,7 @@ namespace Avalonia_3D_STL.Services
         {
             GL gl = renderer.GetContext();
 
-            gl.ClearColor(0.52f, 0.74f, 0.8f, 0.6f);
+            gl.ClearColor(0.56f, 0.74f, 0.8f, 0.6f);
             gl.Clear((uint)GLEnum.ColorBufferBit | (uint)GLEnum.DepthBufferBit | (uint)GLEnum.StencilBufferBit);
 
             {
@@ -144,36 +145,88 @@ namespace Avalonia_3D_STL.Services
         }
 
         private Point StartPoint { get; set; }
-        private Point FinishPoint { get; set; }
 
-        private bool IsPressed { get; set; }
+        private bool IsRightMouseButton { get; set; }
+        private bool IsMiddleMouseButton { get; set; }
 
         public void PressMouseButton(object? sender, PointerPressedEventArgs e)
         {
-            var posX = e.GetCurrentPoint(null).Position.X;
-            var posY = e.GetCurrentPoint(null).Position.Y;
+            var button = e.GetCurrentPoint(null).Properties.PointerUpdateKind;
 
-            IsPressed = true;
+            switch (button)
+            {
+                case PointerUpdateKind.LeftButtonPressed:
+                    break;
+                case PointerUpdateKind.RightButtonPressed:
+                    IsRightMouseButton = true;
+                    break;
+                case PointerUpdateKind.MiddleButtonPressed:
+                    IsMiddleMouseButton = true;
+                    break;
+                default:
+                    break;
+            }
+
             StartPoint = e.GetPosition(null);
         }
 
         public void MoveMouseButton(object? sender, PointerEventArgs e)
         {
-            var t = e.GetCurrentPoint(null).Position;
 
-            if (IsPressed)
+            if (IsRightMouseButton)
             {
-                var P = t - StartPoint;
-                //model = Matrix4X4.CreateFromAxisAngle(new Vector3D<float>((float)P.Y / 10, 0f, 0f), 0.1f);
+                var curPos = e.GetCurrentPoint(null).Position;
+                var P = curPos - StartPoint;
                 model = Matrix4X4.CreateFromYawPitchRoll((float)P.X / 100, (float)P.Y / 100, 0f);
+            }
+
+            if (IsMiddleMouseButton)
+            {
+                var curPos = e.GetCurrentPoint(null).Position;
+                var P = curPos - StartPoint;
+
+                if (curPos.X > StartPoint.X)
+                {
+                    var pos = P.X >= 0 ? (float)P.X * cameraSpeed / 100 : -(float)P.X * cameraSpeed / 100;
+                    cameraPosition.X -= pos;
+                }
+                else if (curPos.X < StartPoint.X)
+                {
+                    var pos = P.X >= 0 ? (float)P.X * cameraSpeed / 100 : -(float)P.X * cameraSpeed / 100;
+                    cameraPosition.X += pos;
+                }
+
+                if (curPos.Y > StartPoint.Y)
+                {
+                    var pos = P.Y >= 0 ? (float)P.Y * cameraSpeed / 100 : -(float)P.Y * cameraSpeed / 100;
+                    cameraPosition.Y += pos;
+                }
+                else if (curPos.Y < StartPoint.Y)
+                {
+                    var pos = P.Y >= 0 ? (float)P.Y * cameraSpeed / 100 : -(float)P.Y * cameraSpeed / 100;
+                    cameraPosition.Y -= pos;
+                }
             }
         }
 
         public void ReleasedMouseButton(object? sender, PointerReleasedEventArgs e)
         {
-            StartPoint = e.GetPosition(null);
 
-            IsPressed = false;
+            var button = e.GetCurrentPoint(null).Properties.PointerUpdateKind;
+
+            switch (button)
+            {
+                case PointerUpdateKind.LeftButtonReleased:
+                    break;
+                case PointerUpdateKind.RightButtonReleased:
+                    IsRightMouseButton = false;
+                    break;
+                case PointerUpdateKind.MiddleButtonReleased:
+                    IsMiddleMouseButton = false;
+                    break;
+                default:
+                    break;
+            }
         }
 
         public void WheelMouse(object? sender, PointerWheelEventArgs e)

@@ -1,40 +1,53 @@
-﻿using Avalonia_3D_STL.Models._3D;
+﻿using Avalonia;
+using Avalonia_3D_STL.Models._3D;
+using Avalonia_3D_STL.Models.Simple;
 using Silk.NET.Maths;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace Avalonia_3D_STL.Helpers
 {
-    public static unsafe class STL_Reader
+    public unsafe class STL_Reader
     {
-        public static void GetModel(out List<Vertex> vertices, out List<uint> indices, float size = 0.5f)
-        {
+        public float MaxX { get; set; } = 0;
+        public float MaxY { get; set; } = 0;
+        public float MaxZ { get; set; } = 0;
 
+        public float MinX { get; set; } = 99999999;
+        public float MinY { get; set; } = 99999999;
+        public float MinZ { get; set; } = 99999999;
+
+        public void GetModel(out List<Vertex> vertices, out List<uint> indices, float size = 0.5f)
+        {
             var parser = new StlBinaryParser();
-            //var triangles = parser.Parse("C:\\Code\\3D\\OpenGLTest\\Assets\\Test.STL");
-            var triangles = parser.Parse("C:\\Code\\3D\\Avalonia_3D_STL\\Assets\\Test.STL");
+            var triangles = parser.Parse("C:\\Code\\3D\\Avalonia_3D_STL\\Assets\\Test2.STL");
             vertices = new List<Vertex>();
 
             foreach (var triangle in triangles)
             {
-
-                //MinY = Math.Min(MinY, triangle.Position[0].Y);
-                //MaxY = Math.Max(MaxY, triangle.Position[0].Y);
-
                 for (int i = 0; i < 3; i++)
                 {
                     var vert = new Vertex();
                     vert.Position = triangle.Position[i];
                     vert.Normal = triangle.Normal;
                     vertices.Add(vert);
+
+                    MaxX = Math.Max(MaxX, triangle.Position[i].X);
+                    MaxY = Math.Max(MaxY, triangle.Position[i].Y);
+                    MaxZ = Math.Max(MaxZ, triangle.Position[i].Z);
+                    MinX = Math.Min(MinX, triangle.Position[i].X);
+                    MinY = Math.Min(MinY, triangle.Position[i].Y);
+                    MinZ = Math.Min(MinZ, triangle.Position[i].Z);
                 }
             }
 
             indices = vertices.Select((a, b) => (uint)b).ToList();
         }
 
-        public static void GetCanvas(out List<Vertex> vertices, out List<uint> indices)
+        public void GetCanvas(out List<Vertex> vertices, out List<uint> indices)
         {
             vertices =
             [
@@ -51,6 +64,7 @@ namespace Avalonia_3D_STL.Helpers
 
         public class StlBinaryParser
         {
+            //Добавить проверку на существование файла
             public List<Triangle> Parse(string filePath)
             {
                 var triangles = new List<Triangle>();
@@ -89,12 +103,6 @@ namespace Avalonia_3D_STL.Helpers
 
                 return triangles;
             }
-        }
-
-        public class Triangle
-        {
-            public Vector3D<float>[] Position = new Vector3D<float>[3];
-            public Vector3D<float> Normal = new Vector3D<float>();
         }
     }
 }

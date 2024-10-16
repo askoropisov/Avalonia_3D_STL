@@ -49,6 +49,7 @@ namespace Avalonia_3D_STL.Models._3D
         protected override void OnOpenGlInit(GlInterface gl)
         {
             _stopwatch.Start();
+            STL_Reader reader = new STL_Reader();
 
             // Initialize the OpenGL context
             {
@@ -59,7 +60,7 @@ namespace Avalonia_3D_STL.Models._3D
                 using Shader fs = new(this, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Canvas.frag"));
                 canvasPipeline = new RenderPipeline(this, vs, fs);
 
-                STL_Reader.GetCanvas(out List<Vertex> vertices, out List<uint> indices);
+                reader.GetCanvas(out List<Vertex> vertices, out List<uint> indices);
                 //STL_Reader.GetModel(out List<Vertex> vertices, out List<uint> indices);
                 canvasMeshes = [new(this, vertices, indices)];
             }
