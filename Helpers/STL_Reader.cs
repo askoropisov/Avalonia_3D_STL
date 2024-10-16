@@ -1,9 +1,7 @@
-﻿using Avalonia;
-using Avalonia_3D_STL.Models._3D;
+﻿using Avalonia_3D_STL.Models._3D;
 using Avalonia_3D_STL.Models.Simple;
 using Silk.NET.Maths;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,7 +13,6 @@ namespace Avalonia_3D_STL.Helpers
         public float MaxX { get; set; } = 0;
         public float MaxY { get; set; } = 0;
         public float MaxZ { get; set; } = 0;
-
         public float MinX { get; set; } = 99999999;
         public float MinY { get; set; } = 99999999;
         public float MinZ { get; set; } = 99999999;
@@ -60,6 +57,28 @@ namespace Avalonia_3D_STL.Helpers
             ];
 
             indices = vertices.Select((a, b) => (uint)b).ToList();
+        }
+
+        public Vector3D<float> GetCenter()
+        {
+            Vector3D<float> center = new Vector3D<float>();
+
+            center.X = (MaxX + MinX) / 2;
+            center.Y = (MaxY + MinY) / 2;
+            center.Z = (MaxZ + MinZ) / 2;
+
+            return center;
+        }
+
+        public Vector3D<float> GetSizes()
+        {
+            Vector3D<float> sizes = new Vector3D<float>();
+
+            sizes.X = (MaxX - MinX);
+            sizes.Y = (MaxY - MinY);
+            sizes.Z = (MaxZ - MinZ);
+
+            return sizes;
         }
 
         public class StlBinaryParser

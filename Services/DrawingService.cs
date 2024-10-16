@@ -8,6 +8,7 @@ using Silk.NET.OpenGLES;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 
 namespace Avalonia_3D_STL.Services
 {
@@ -17,15 +18,10 @@ namespace Avalonia_3D_STL.Services
         private struct UniTransforms
         {
             public Matrix4X4<float> Model;
-
             public Matrix4X4<float> View;
-
             public Matrix4X4<float> Projection;
-
             public Matrix4X4<float> ObjectToWorld;
-
             public Matrix4X4<float> ObjectToClip;
-
             public Matrix4X4<float> WorldToObject;
         }
 
@@ -37,30 +33,25 @@ namespace Avalonia_3D_STL.Services
 
         private Renderer renderer = null!;
         private Camera camera = null!;
-
-        private Vector3D<float> cameraPosition = new Vector3D<float>(50.0f, 0.0f, 120.0f); // Начальная позиция камеры
-        private float cameraDistance = 50.0f; // Начальное расстояние до модели
-        private float cameraSpeed = 1f; // Скорость перемещения камеры
-
-        #region Pipelines
+        private STL_Reader reader = new STL_Reader();
         private RenderPipeline simplePipeline = null!;
         private RenderPipeline solidColorPipeline = null!;
-        #endregion
-
-        #region Meshes
         private List<Figure> Meshes = null!;
-        #endregion
+        private Matrix4X4<float> Model = Matrix4X4<float>.Identity;
 
-        private Matrix4X4<float> model = Matrix4X4<float>.Identity;
-        private Vector4D<float> color = new(1f, 0.57f, 0.0f, 0.5f);
+        private Vector3D<float> cameraPosition = new Vector3D<float>(0.0f, 0.0f, 0.0f); // Начальная позиция камеры
+        private float cameraSpeed = 1f;
+        private float CurrentYaw = 0f;
+        private float CurrentPitch = 0f;
+
+        private Point StartPoint;
+        private bool IsRightMouseButton;
+        private bool IsMiddleMouseButton;
+
 
         public void Load(object[] args)
         {
-            STL_Reader reader = new STL_Reader();
             renderer = (Renderer)args[0];
-            camera = new Camera();
-            camera.Position = cameraPosition;
-            camera.Fov = 250f;
 
             using Models._3D.Shader vs1 = new(renderer, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.vert"));
             using Models._3D.Shader fs1 = new(renderer, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.frag"));
@@ -73,15 +64,16 @@ namespace Avalonia_3D_STL.Services
 
             reader.GetModel(out List<Vertex> vertices, out List<uint> indices);
             Meshes = [new(renderer, vertices, indices)];
+
+            camera = new Camera();
+            float distance = Math.Max(reader.GetSizes().X, reader.GetSizes().Y);
+            cameraPosition = reader.GetCenter() + new Vector3D<float> (0, 0, distance);
+            camera.Position = cameraPosition;
         }
 
         public void Update(double deltaSeconds)
         {
             camera.Position = cameraPosition;
-
-            //Обновление и вращение модели по времени deltaSec
-            //model = Matrix4X4.CreateFromAxisAngle(new Vector3D<float>(0.0f, 0.0f, 0.0f), 0);
-
             camera.Width = (int)renderer.Bounds.Width;
             camera.Height = (int)renderer.Bounds.Height;
         }
@@ -89,12 +81,11 @@ namespace Avalonia_3D_STL.Services
         public void Render(double deltaSeconds)
         {
             GL gl = renderer.GetContext();
-
             gl.ClearColor(0.56f, 0.74f, 0.8f, 0.6f);
             gl.Clear((uint)GLEnum.ColorBufferBit | (uint)GLEnum.DepthBufferBit | (uint)GLEnum.StencilBufferBit);
 
             {
-                Matrix4X4<float> m = model * Matrix4X4.CreateTranslation(new Vector3D<float>(0.0f, 0.0f, 0.0f));
+                Matrix4X4<float> m = Model * Matrix4X4.CreateTranslation(new Vector3D<float>(0.0f, 0.0f, 0.0f));
 
                 foreach (Figure mesh in Meshes)
                 {
@@ -104,14 +95,14 @@ namespace Avalonia_3D_STL.Services
                     {
                         Model = m,
                         View = camera.View,
-                        //Projection = camera.Projection,
+                        Projection = camera.Projection,
                         ObjectToWorld = m,
                         ObjectToClip = m * camera.View * camera.Projection,
                     });
 
                     solidColorPipeline.SetUniform(string.Empty, new UniParameters()
                     {
-                        Color = color
+                        Color = new(1f, 0.57f, 0.0f, 0.5f)
                     });
 
                     mesh.VertexAttributePointer((uint)solidColorPipeline.GetAttribLocation("In_Position"), 3, nameof(Vertex.Position));
@@ -144,11 +135,7 @@ namespace Avalonia_3D_STL.Services
             }
         }
 
-        private Point StartPoint { get; set; }
-
-        private bool IsRightMouseButton { get; set; }
-        private bool IsMiddleMouseButton { get; set; }
-
+        #region MouseController
         public void PressMouseButton(object? sender, PointerPressedEventArgs e)
         {
             var button = e.GetCurrentPoint(null).Properties.PointerUpdateKind;
@@ -159,62 +146,51 @@ namespace Avalonia_3D_STL.Services
                     break;
                 case PointerUpdateKind.RightButtonPressed:
                     IsRightMouseButton = true;
+                    StartPoint = e.GetPosition(null);
                     break;
                 case PointerUpdateKind.MiddleButtonPressed:
                     IsMiddleMouseButton = true;
-                    break;
-                default:
+                    StartPoint = e.GetPosition(null);
                     break;
             }
-
-            StartPoint = e.GetPosition(null);
         }
 
         public void MoveMouseButton(object? sender, PointerEventArgs e)
         {
+            var curPos = e.GetPosition(null);
+            var P = curPos - StartPoint;
+            var modelCenter = reader.GetCenter();
+
+            var distance = Vector3.Distance((Vector3)cameraPosition, (Vector3)modelCenter);
+            float speedFactor = MathF.Log(distance + 1);
 
             if (IsRightMouseButton)
             {
-                var curPos = e.GetCurrentPoint(null).Position;
-                var P = curPos - StartPoint;
-                model = Matrix4X4.CreateFromYawPitchRoll((float)P.X / 100, (float)P.Y / 100, 0f);
+                CurrentYaw += (float)P.X / 20000;
+                CurrentPitch += (float)P.Y / 20000;
+
+                //Ограничения вращения по осям (оборотам)
+                //CurrentPitch = Math.Clamp(CurrentPitch, -MathF.PI, MathF.PI);
+                //CurrentYaw = Math.Clamp(CurrentYaw, -MathF.PI, MathF.PI);
+
+                var translationToOrigin = Matrix4X4.CreateTranslation(-modelCenter);
+                var rotation = Matrix4X4.CreateFromYawPitchRoll(CurrentYaw, -CurrentPitch, 0f);
+                var translationBack = Matrix4X4.CreateTranslation(modelCenter);
+
+                Model = translationToOrigin * rotation * translationBack;
             }
 
             if (IsMiddleMouseButton)
             {
-                var curPos = e.GetCurrentPoint(null).Position;
-                var P = curPos - StartPoint;
-
-                if (curPos.X > StartPoint.X)
-                {
-                    var pos = P.X >= 0 ? (float)P.X * cameraSpeed / 100 : -(float)P.X * cameraSpeed / 100;
-                    cameraPosition.X -= pos;
-                }
-                else if (curPos.X < StartPoint.X)
-                {
-                    var pos = P.X >= 0 ? (float)P.X * cameraSpeed / 100 : -(float)P.X * cameraSpeed / 100;
-                    cameraPosition.X += pos;
-                }
-
-                if (curPos.Y > StartPoint.Y)
-                {
-                    var pos = P.Y >= 0 ? (float)P.Y * cameraSpeed / 100 : -(float)P.Y * cameraSpeed / 100;
-                    cameraPosition.Y += pos;
-                }
-                else if (curPos.Y < StartPoint.Y)
-                {
-                    var pos = P.Y >= 0 ? (float)P.Y * cameraSpeed / 100 : -(float)P.Y * cameraSpeed / 100;
-                    cameraPosition.Y -= pos;
-                }
+                cameraPosition.X -= (float)P.X * speedFactor / 12.5f;
+                cameraPosition.Y += (float)P.Y * speedFactor / 12.5f;
+                StartPoint = curPos;
             }
         }
 
         public void ReleasedMouseButton(object? sender, PointerReleasedEventArgs e)
         {
-
-            var button = e.GetCurrentPoint(null).Properties.PointerUpdateKind;
-
-            switch (button)
+            switch (e.GetCurrentPoint(null).Properties.PointerUpdateKind)
             {
                 case PointerUpdateKind.LeftButtonReleased:
                     break;
@@ -224,8 +200,6 @@ namespace Avalonia_3D_STL.Services
                 case PointerUpdateKind.MiddleButtonReleased:
                     IsMiddleMouseButton = false;
                     break;
-                default:
-                    break;
             }
         }
 
@@ -234,5 +208,6 @@ namespace Avalonia_3D_STL.Services
             if (e.Delta.Y > 0) cameraPosition.Z -= cameraSpeed * 10;
             else cameraPosition.Z += cameraSpeed * 10;
         }
+        #endregion
     }
 }
