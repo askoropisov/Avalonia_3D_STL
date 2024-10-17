@@ -1,6 +1,4 @@
 using Avalonia.Controls;
-using Avalonia_3D_STL.Helpers;
-using Avalonia_3D_STL.Services;
 using Avalonia_3D_STL.ViewModels;
 using System;
 using System.Collections.Generic;

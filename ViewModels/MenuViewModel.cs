@@ -1,30 +1,31 @@
-﻿using Avalonia_3D_STL.Services;
+﻿using Avalonia_3D_STL.Helpers;
+using Avalonia_3D_STL.Services;
 using System.Threading.Tasks;
 
 namespace Avalonia_3D_STL.ViewModels
 {
     public class MenuViewModel : ViewModelBase
     {
-        private readonly DrawingService _drawingService;
 
-        public MenuViewModel(DrawingService drawingService)
+        public MenuViewModel()
         {
-            _drawingService = drawingService;
+
         }
 
         public async Task LoadSTL(string file)
         {
-            _drawingService.LoadFile();
+            STL_Reader.FileSTL = file;
+            DrawingService.LoadFile();
         }
 
         public void Clear()
         {
-
+            DrawingService.Clear();
         }
 
         public void StartPosition()
         {
-
+            DrawingService.StartPosition();
         }
     }
 }

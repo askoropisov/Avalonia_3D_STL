@@ -7,20 +7,20 @@ using System.Linq;
 
 namespace Avalonia_3D_STL.Helpers
 {
-    public unsafe class STL_Reader
+    public static unsafe class STL_Reader
     {
-        private float MaxX { get; set; } = 0;
-        private float MaxY { get; set; } = 0;
-        private float MaxZ { get; set; } = 0;
-        private float MinX { get; set; } = 99999999;
-        private float MinY { get; set; } = 99999999;
-        private float MinZ { get; set; } = 99999999;
+        private static float MaxX { get; set; } = 0;
+        private static float MaxY { get; set; } = 0;
+        private static float MaxZ { get; set; } = 0;
+        private static float MinX { get; set; } = 99999999;
+        private static float MinY { get; set; } = 99999999;
+        private static float MinZ { get; set; } = 99999999;
 
-        public string? FileSTL { get; set; } = string.Empty;
+        public static string? FileSTL { get; set; } = string.Empty;
 
-        public void GetModel(out List<Vertex> vertices, out List<uint> indices, float size = 0.5f)
+        public static void GetModel(out List<Vertex> vertices, out List<uint> indices, float size = 0.5f)
         {
-            if(string.IsNullOrEmpty(FileSTL)) FileSTL = "C:\\Code\\3D\\Avalonia_3D_STL\\Assets\\Test2.STL";
+            if (string.IsNullOrEmpty(FileSTL)) FileSTL = "C:\\Code\\3D\\Avalonia_3D_STL\\Assets\\Test2.STL";
 
             var parser = new StlBinaryParser();
             var triangles = parser.Parse(FileSTL);
@@ -48,7 +48,7 @@ namespace Avalonia_3D_STL.Helpers
             indices = vertices.Select((a, b) => (uint)b).ToList();
         }
 
-        public void GetCanvas(out List<Vertex> vertices, out List<uint> indices)
+        public static void GetCanvas(out List<Vertex> vertices, out List<uint> indices)
         {
             vertices =
             [
@@ -63,7 +63,7 @@ namespace Avalonia_3D_STL.Helpers
             indices = vertices.Select((a, b) => (uint)b).ToList();
         }
 
-        public Vector3D<float> GetCenter()
+        public static Vector3D<float> GetCenter()
         {
             Vector3D<float> center = new Vector3D<float>();
 
@@ -74,7 +74,7 @@ namespace Avalonia_3D_STL.Helpers
             return center;
         }
 
-        public Vector3D<float> GetSizes()
+        public static Vector3D<float> GetSizes()
         {
             Vector3D<float> sizes = new Vector3D<float>();
 

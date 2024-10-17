@@ -1,7 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Input;
 using Avalonia_3D_STL.Helpers;
-using Avalonia_3D_STL.Interfaces;
 using Avalonia_3D_STL.Models._3D;
 using Avalonia_3D_STL.Models.Simple;
 using Silk.NET.Maths;
@@ -13,7 +12,7 @@ using System.Numerics;
 
 namespace Avalonia_3D_STL.Services
 {
-    public class DrawingService 
+    public static class DrawingService
     {
         #region Uniforms
         private struct UniTransforms
@@ -32,117 +31,129 @@ namespace Avalonia_3D_STL.Services
         }
         #endregion
 
-        private Renderer renderer = null!;
-        private Camera camera = null!;
-        private STL_Reader Reader = new STL_Reader();
-        private RenderPipeline simplePipeline = null!;
-        private RenderPipeline solidColorPipeline = null!;
-        private List<Figure> Meshes = null!;
-        private Matrix4X4<float> Model = Matrix4X4<float>.Identity;
+        private static Renderer Renderer = null!;
+        private static Camera Camera = null!;
+        private static RenderPipeline SimplePipeline = null!;
+        private static RenderPipeline SolidColorPipeline = null!;
+        private static List<Figure> Meshes = new List<Figure>();
+        private static Matrix4X4<float> Model = Matrix4X4<float>.Identity;
 
-        private Vector3D<float> cameraPosition = new Vector3D<float>(0.0f, 0.0f, 0.0f); // Начальная позиция камеры
-        private float cameraSpeed = 1f;
-        private float CurrentYaw = 0f;
-        private float CurrentPitch = 0f;
+        private static Vector3D<float> cameraPosition = new Vector3D<float>(0.0f, 0.0f, 0.0f); // Начальная позиция камеры
+        private static float CameraSpeed = 1f;
+        private static float CurrentYaw = 0f;
+        private static float CurrentPitch = 0f;
 
-        private Point StartPoint;
-        private bool IsRightMouseButton;
-        private bool IsMiddleMouseButton;
+        private static Point StartPoint;
+        private static bool IsRightMouseButton;
+        private static bool IsMiddleMouseButton;
 
-
-        public void Load(object[] args)
+        public static void Load(object[] args)
         {
-            renderer = (Renderer)args[0];
+            Renderer = (Renderer)args[0];
 
-            using Models._3D.Shader vs1 = new(renderer, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.vert"));
-            using Models._3D.Shader fs1 = new(renderer, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.frag"));
-            simplePipeline = new RenderPipeline(renderer, vs1, fs1);
+            using Models._3D.Shader vs1 = new(Renderer, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.vert"));
+            using Models._3D.Shader fs1 = new(Renderer, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.frag"));
+            SimplePipeline = new RenderPipeline(Renderer, vs1, fs1);
 
-            using Models._3D.Shader vs2 = new(renderer, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\SolidColor.vert"));
-            using Models._3D.Shader fs2 = new(renderer, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\SolidColor.frag"));
+            using Models._3D.Shader vs2 = new(Renderer, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\SolidColor.vert"));
+            using Models._3D.Shader fs2 = new(Renderer, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\SolidColor.frag"));
 
-            solidColorPipeline = new RenderPipeline(renderer, vs2, fs2);
+            SolidColorPipeline = new RenderPipeline(Renderer, vs2, fs2);
 
             LoadFile();
         }
 
-        public void LoadFile()
+        public static void LoadFile()
         {
-            Reader.GetModel(out List<Vertex> vertices, out List<uint> indices);
-            Meshes = [new(renderer, vertices, indices)];
-
-            camera = new Camera();
-            float distance = Math.Max(Reader.GetSizes().X, Reader.GetSizes().Y);
-            cameraPosition = Reader.GetCenter() + new Vector3D<float>(0, 0, distance);
-            camera.Position = cameraPosition;
+            STL_Reader.GetModel(out List<Vertex> vertices, out List<uint> indices);
+            Meshes.Clear();
+            Meshes.Add(new(Renderer, vertices, indices));
+            StartPosition();
         }
 
-        public void Update(double deltaSeconds)
+        public static void StartPosition()
         {
-            camera.Position = cameraPosition;
-            camera.Width = (int)renderer.Bounds.Width;
-            camera.Height = (int)renderer.Bounds.Height;
+            Camera = new Camera();
+            CurrentPitch = 0f;
+            CurrentYaw = 0f;
+            CameraSpeed = 1f;
+            StartPoint = new Point();
+            float distance = Math.Max(STL_Reader.GetSizes().X, STL_Reader.GetSizes().Y);
+            cameraPosition = STL_Reader.GetCenter() + new Vector3D<float>(0, 0, distance);
+            Model = Matrix4X4.CreateFromYawPitchRoll(0f, 0f, 0f);
         }
 
-        public void Render(double deltaSeconds)
+        public static void Clear()
         {
-            GL gl = renderer.GetContext();
+            Meshes.Clear();
+        }
+
+        public static void Update(double deltaSeconds)
+        {
+            Camera.Position = cameraPosition;
+            Camera.Width = (int)Renderer.Bounds.Width;
+            Camera.Height = (int)Renderer.Bounds.Height;
+        }
+
+        public static void Render(double deltaSeconds)
+        {
+            GL gl = Renderer.GetContext();
             gl.ClearColor(0.56f, 0.74f, 0.8f, 0.6f);
             gl.Clear((uint)GLEnum.ColorBufferBit | (uint)GLEnum.DepthBufferBit | (uint)GLEnum.StencilBufferBit);
 
+            Matrix4X4<float> m = Model * Matrix4X4.CreateTranslation(new Vector3D<float>(0.0f, 0.0f, 0.0f));
+
+            foreach (Figure mesh in Meshes)
             {
-                Matrix4X4<float> m = Model * Matrix4X4.CreateTranslation(new Vector3D<float>(0.0f, 0.0f, 0.0f));
+                SolidColorPipeline.Bind();
 
-                foreach (Figure mesh in Meshes)
+                SolidColorPipeline.SetUniform(string.Empty, new UniTransforms()
                 {
-                    solidColorPipeline.Bind();
+                    Model = m,
+                    View = Camera.View,
+                    Projection = Camera.Projection,
+                    ObjectToWorld = m,
+                    ObjectToClip = m * Camera.View * Camera.Projection,
+                });
 
-                    solidColorPipeline.SetUniform(string.Empty, new UniTransforms()
-                    {
-                        Model = m,
-                        View = camera.View,
-                        Projection = camera.Projection,
-                        ObjectToWorld = m,
-                        ObjectToClip = m * camera.View * camera.Projection,
-                    });
+                SolidColorPipeline.SetUniform(string.Empty, new UniParameters()
+                {
+                    Color = new(1f, 0.57f, 0.0f, 0.5f)
+                });
 
-                    solidColorPipeline.SetUniform(string.Empty, new UniParameters()
-                    {
-                        Color = new(1f, 0.57f, 0.0f, 0.5f)
-                    });
+                mesh.VertexAttributePointer((uint)SolidColorPipeline.GetAttribLocation("In_Position"), 3, nameof(Vertex.Position));
+                mesh.VertexAttributePointer((uint)SolidColorPipeline.GetAttribLocation("In_Normal"), 3, nameof(Vertex.Normal));
+                mesh.VertexAttributePointer((uint)SolidColorPipeline.GetAttribLocation("In_Color"), 4, nameof(Vertex.Color));
 
-                    mesh.VertexAttributePointer((uint)solidColorPipeline.GetAttribLocation("In_Position"), 3, nameof(Vertex.Position));
-                    mesh.VertexAttributePointer((uint)solidColorPipeline.GetAttribLocation("In_Normal"), 3, nameof(Vertex.Normal));
-                    mesh.VertexAttributePointer((uint)solidColorPipeline.GetAttribLocation("In_Color"), 4, nameof(Vertex.Color));
+                mesh.Draw();
 
-                    mesh.Draw();
-
-                    solidColorPipeline.Unbind();
-                }
+                SolidColorPipeline.Unbind();
             }
         }
 
-        public void KeyReader(object? sender, KeyEventArgs e)
+        #region KeyController
+        public static void KeyReader(object? sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
                 case Key.W:
-                    cameraPosition.Y -= cameraSpeed * 10;
+                    cameraPosition.Y -= CameraSpeed * 10;
                     break;
                 case Key.A:
-                    cameraPosition.X += cameraSpeed * 10;
+                    cameraPosition.X += CameraSpeed * 10;
                     break;
                 case Key.S:
-                    cameraPosition.Y += cameraSpeed * 10;
+                    cameraPosition.Y += CameraSpeed * 10;
                     break;
                 case Key.D:
-                    cameraPosition.X -= cameraSpeed * 10;
+                    cameraPosition.X -= CameraSpeed * 10;
                     break;
             }
         }
+        #endregion
 
         #region MouseController
-        public void PressMouseButton(object? sender, PointerPressedEventArgs e)
+        public static void PressMouseButton(object? sender, PointerPressedEventArgs e)
         {
             var button = e.GetCurrentPoint(null).Properties.PointerUpdateKind;
 
@@ -161,11 +172,11 @@ namespace Avalonia_3D_STL.Services
             }
         }
 
-        public void MoveMouseButton(object? sender, PointerEventArgs e)
+        public static void MoveMouseButton(object? sender, PointerEventArgs e)
         {
             var curPos = e.GetPosition(null);
             var P = curPos - StartPoint;
-            var modelCenter = Reader.GetCenter();
+            var modelCenter = STL_Reader.GetCenter();
 
             var distance = Vector3.Distance((Vector3)cameraPosition, (Vector3)modelCenter);
             float speedFactor = MathF.Log(distance + 1);
@@ -194,7 +205,7 @@ namespace Avalonia_3D_STL.Services
             }
         }
 
-        public void ReleasedMouseButton(object? sender, PointerReleasedEventArgs e)
+        public static void ReleasedMouseButton(object? sender, PointerReleasedEventArgs e)
         {
             switch (e.GetCurrentPoint(null).Properties.PointerUpdateKind)
             {
@@ -209,10 +220,10 @@ namespace Avalonia_3D_STL.Services
             }
         }
 
-        public void WheelMouse(object? sender, PointerWheelEventArgs e)
+        public static void WheelMouse(object? sender, PointerWheelEventArgs e)
         {
-            if (e.Delta.Y > 0) cameraPosition.Z -= cameraSpeed * 10;
-            else cameraPosition.Z += cameraSpeed * 10;
+            if (e.Delta.Y > 0) cameraPosition.Z -= CameraSpeed * 10;
+            else cameraPosition.Z += CameraSpeed * 10;
         }
         #endregion
     }

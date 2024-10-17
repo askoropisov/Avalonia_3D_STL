@@ -4,7 +4,6 @@ using Avalonia.Markup.Xaml;
 using Avalonia_3D_STL.Factories;
 using Avalonia_3D_STL.Helpers;
 using Avalonia_3D_STL.Interfaces;
-using Avalonia_3D_STL.Services;
 using Avalonia_3D_STL.ViewModels;
 using Avalonia_3D_STL.Views;
 using DryIoc;
@@ -42,7 +41,7 @@ public partial class App : Application
         //Services
         //container.RegisterMany<ConnectionService>(Reuse.Singleton);
         //container.RegisterMany<NavigationService>(Reuse.Singleton);
-        container.Register<DrawingService>(Reuse.Singleton);
+        //container.Register<DrawingService>(Reuse.Singleton);
 
         //Singleton ViewModels
 
@@ -52,7 +51,7 @@ public partial class App : Application
 
 
         //Singleton Classes
-        container.Register<STL_Reader>(Reuse.Singleton);
+        //container.Register<STL_Reader>(Reuse.Singleton);
 
 
 
