@@ -6,11 +6,11 @@ namespace Avalonia_3D_STL.Views;
 
 public partial class STL_View : UserControl
 {
-    private readonly IDrawingService _drawingService1;
+    //private readonly IDrawingService _drawingService1;
 
     public STL_View()
     {
-        _drawingService1 = new SimpleDrawingService();
+        DrawingService _drawingService1 = new DrawingService();
 
         InitializeComponent();
 

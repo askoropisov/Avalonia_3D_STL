@@ -5,6 +5,7 @@ using Avalonia.OpenGL.Controls;
 using Avalonia.Threading;
 using Avalonia_3D_STL.Helpers;
 using Avalonia_3D_STL.Interfaces;
+using Avalonia_3D_STL.Models.Simple;
 using Silk.NET.OpenGLES;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
 ﻿using Silk.NET.Maths;
 
-namespace Avalonia_3D_STL.Models._3D
+namespace Avalonia_3D_STL.Models.Simple
 {
     public struct Vertex(Vector3D<float> position = default, Vector3D<float> normal = default, Vector4D<float> color = default, Vector2D<float> texCoord = default)
     {

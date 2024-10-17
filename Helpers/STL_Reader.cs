@@ -1,5 +1,4 @@
-﻿using Avalonia_3D_STL.Models._3D;
-using Avalonia_3D_STL.Models.Simple;
+﻿using Avalonia_3D_STL.Models.Simple;
 using Silk.NET.Maths;
 using System;
 using System.Collections.Generic;
@@ -10,17 +9,21 @@ namespace Avalonia_3D_STL.Helpers
 {
     public unsafe class STL_Reader
     {
-        public float MaxX { get; set; } = 0;
-        public float MaxY { get; set; } = 0;
-        public float MaxZ { get; set; } = 0;
-        public float MinX { get; set; } = 99999999;
-        public float MinY { get; set; } = 99999999;
-        public float MinZ { get; set; } = 99999999;
+        private float MaxX { get; set; } = 0;
+        private float MaxY { get; set; } = 0;
+        private float MaxZ { get; set; } = 0;
+        private float MinX { get; set; } = 99999999;
+        private float MinY { get; set; } = 99999999;
+        private float MinZ { get; set; } = 99999999;
+
+        public string? FileSTL { get; set; } = string.Empty;
 
         public void GetModel(out List<Vertex> vertices, out List<uint> indices, float size = 0.5f)
         {
+            if(string.IsNullOrEmpty(FileSTL)) FileSTL = "C:\\Code\\3D\\Avalonia_3D_STL\\Assets\\Test2.STL";
+
             var parser = new StlBinaryParser();
-            var triangles = parser.Parse("C:\\Code\\3D\\Avalonia_3D_STL\\Assets\\Test2.STL");
+            var triangles = parser.Parse(FileSTL);
             vertices = new List<Vertex>();
 
             foreach (var triangle in triangles)
@@ -32,6 +35,7 @@ namespace Avalonia_3D_STL.Helpers
                     vert.Normal = triangle.Normal;
                     vertices.Add(vert);
 
+                    //Плохая реализация, нужно исправить
                     MaxX = Math.Max(MaxX, triangle.Position[i].X);
                     MaxY = Math.Max(MaxY, triangle.Position[i].Y);
                     MaxZ = Math.Max(MaxZ, triangle.Position[i].Z);
@@ -86,6 +90,11 @@ namespace Avalonia_3D_STL.Helpers
             //Добавить проверку на существование файла
             public List<Triangle> Parse(string filePath)
             {
+                if (!File.Exists(filePath))
+                {
+                    throw new Exception("File not existed");
+                }
+
                 var triangles = new List<Triangle>();
 
                 using (var reader = new BinaryReader(File.Open(filePath, FileMode.Open)))

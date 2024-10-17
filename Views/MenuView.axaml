@@ -15,9 +15,9 @@
         Orientation="Vertical"
         Spacing="10">
         <Button
+            Name="OpenFile"
             Width="240"
             HorizontalContentAlignment="Center"
-            Command="{Binding LoadSTL}"
             Content="Загрузить файл"
             FontSize="20" />
         <Button

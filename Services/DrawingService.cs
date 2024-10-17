@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia_3D_STL.Helpers;
 using Avalonia_3D_STL.Interfaces;
 using Avalonia_3D_STL.Models._3D;
+using Avalonia_3D_STL.Models.Simple;
 using Silk.NET.Maths;
 using Silk.NET.OpenGLES;
 using System;
@@ -12,7 +13,7 @@ using System.Numerics;
 
 namespace Avalonia_3D_STL.Services
 {
-    public class SimpleDrawingService : IDrawingService
+    public class DrawingService 
     {
         #region Uniforms
         private struct UniTransforms
@@ -33,7 +34,7 @@ namespace Avalonia_3D_STL.Services
 
         private Renderer renderer = null!;
         private Camera camera = null!;
-        private STL_Reader reader = new STL_Reader();
+        private STL_Reader Reader = new STL_Reader();
         private RenderPipeline simplePipeline = null!;
         private RenderPipeline solidColorPipeline = null!;
         private List<Figure> Meshes = null!;
@@ -62,12 +63,17 @@ namespace Avalonia_3D_STL.Services
 
             solidColorPipeline = new RenderPipeline(renderer, vs2, fs2);
 
-            reader.GetModel(out List<Vertex> vertices, out List<uint> indices);
+            LoadFile();
+        }
+
+        public void LoadFile()
+        {
+            Reader.GetModel(out List<Vertex> vertices, out List<uint> indices);
             Meshes = [new(renderer, vertices, indices)];
 
             camera = new Camera();
-            float distance = Math.Max(reader.GetSizes().X, reader.GetSizes().Y);
-            cameraPosition = reader.GetCenter() + new Vector3D<float>(0, 0, distance);
+            float distance = Math.Max(Reader.GetSizes().X, Reader.GetSizes().Y);
+            cameraPosition = Reader.GetCenter() + new Vector3D<float>(0, 0, distance);
             camera.Position = cameraPosition;
         }
 
@@ -159,7 +165,7 @@ namespace Avalonia_3D_STL.Services
         {
             var curPos = e.GetPosition(null);
             var P = curPos - StartPoint;
-            var modelCenter = reader.GetCenter();
+            var modelCenter = Reader.GetCenter();
 
             var distance = Vector3.Distance((Vector3)cameraPosition, (Vector3)modelCenter);
             float speedFactor = MathF.Log(distance + 1);
