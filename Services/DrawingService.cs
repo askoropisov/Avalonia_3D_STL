@@ -67,7 +67,7 @@ namespace Avalonia_3D_STL.Services
 
             camera = new Camera();
             float distance = Math.Max(reader.GetSizes().X, reader.GetSizes().Y);
-            cameraPosition = reader.GetCenter() + new Vector3D<float> (0, 0, distance);
+            cameraPosition = reader.GetCenter() + new Vector3D<float>(0, 0, distance);
             camera.Position = cameraPosition;
         }
 

@@ -1,10 +1,8 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Avalonia_3D_STL.Interfaces;
 using Avalonia_3D_STL.Services;
 
-namespace Avalonia_3D_STL;
+namespace Avalonia_3D_STL.Views;
 
 public partial class STL_View : UserControl
 {

@@ -1,18 +1,17 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-
+using Avalonia_3D_STL.Factories;
+using Avalonia_3D_STL.Helpers;
+using Avalonia_3D_STL.Interfaces;
 using Avalonia_3D_STL.ViewModels;
 using Avalonia_3D_STL.Views;
 using DryIoc;
 using Microsoft.Extensions.Configuration;
-using Splat.DryIoc;
-using Splat;
 using ReactiveUI;
-using Avalonia_3D_STL.Helpers;
-using Avalonia_3D_STL.Factories;
+using Splat;
+using Splat.DryIoc;
 using System;
-using Avalonia_3D_STL.Interfaces;
 using System.Linq;
 
 namespace Avalonia_3D_STL;
@@ -48,6 +47,7 @@ public partial class App : Application
 
         container.Register<MainViewModel>(Reuse.Singleton);
         container.Register<STL_ViewModel>(Reuse.Singleton);
+        container.Register<MenuViewModel>(Reuse.Singleton);
 
 
         //CreateNewStep singleton ViewModels
@@ -104,13 +104,6 @@ public partial class App : Application
             desktop.MainWindow = Container.Resolve<MainWindow>();
             desktop.MainWindow.DataContext = vm;
             desktop.MainWindow.WindowState = state;
-        }
-        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-        {
-            singleViewPlatform.MainView = new MainView
-            {
-                DataContext = new MainViewModel()
-            };
         }
 
         base.OnFrameworkInitializationCompleted();

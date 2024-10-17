@@ -1,10 +1,5 @@
 ﻿using Avalonia_3D_STL.Interfaces;
 using Silk.NET.OpenGLES;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Avalonia_3D_STL.Models._3D
 {

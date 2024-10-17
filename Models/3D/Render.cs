@@ -1,19 +1,15 @@
-﻿using Avalonia.Controls;
-using Avalonia.OpenGL.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.OpenGL;
+using Avalonia.OpenGL.Controls;
 using Avalonia.Threading;
-using Avalonia;
-using DynamicData.Tests;
+using Avalonia_3D_STL.Helpers;
+using Avalonia_3D_STL.Interfaces;
 using Silk.NET.OpenGLES;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Avalonia_3D_STL.Interfaces;
 using System.IO;
-using Avalonia_3D_STL.Helpers;
 
 namespace Avalonia_3D_STL.Models._3D
 {
