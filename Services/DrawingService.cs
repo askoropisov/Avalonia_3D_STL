@@ -54,11 +54,7 @@ namespace Avalonia_3D_STL.Services
             using Models._3D.Shader vs1 = new(Renderer, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.vert"));
             using Models._3D.Shader fs1 = new(Renderer, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.frag"));
             SimplePipeline = new RenderPipeline(Renderer, vs1, fs1);
-
-            using Models._3D.Shader vs2 = new(Renderer, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\SolidColor.vert"));
-            using Models._3D.Shader fs2 = new(Renderer, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\SolidColor.frag"));
-
-            SolidColorPipeline = new RenderPipeline(Renderer, vs2, fs2);
+            SolidColorPipeline = SimplePipeline;
 
             LoadFile();
         }

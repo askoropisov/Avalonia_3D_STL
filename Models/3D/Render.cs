@@ -16,7 +16,7 @@ namespace Avalonia_3D_STL.Models._3D
 {
     public class Renderer : OpenGlControlBase, IGraphicsHost<GL>
     {
-        public static readonly StyledProperty<int> SamplesProperty = AvaloniaProperty.Register<Renderer, int>("Samples", 4);
+        public static readonly StyledProperty<int> SamplesProperty = AvaloniaProperty.Register<Renderer, int>("Samples", 8);
 
         private readonly Stopwatch _stopwatch = new();
 
