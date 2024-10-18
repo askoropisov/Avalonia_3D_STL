@@ -16,7 +16,6 @@
         <UniformGrid>
             <Grid Margin="4">
                 <openGL:Renderer x:Name="glRenderer1" />
-
             </Grid>
         </UniformGrid>
     </Button>

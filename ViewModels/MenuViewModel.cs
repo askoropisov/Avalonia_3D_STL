@@ -1,5 +1,8 @@
-﻿using Avalonia_3D_STL.Helpers;
+﻿using Avalonia.Media;
+using Avalonia_3D_STL.Helpers;
 using Avalonia_3D_STL.Services;
+using ReactiveUI;
+using Silk.NET.Maths;
 using System.Threading.Tasks;
 
 namespace Avalonia_3D_STL.ViewModels
@@ -10,6 +13,19 @@ namespace Avalonia_3D_STL.ViewModels
         public MenuViewModel()
         {
 
+        }
+
+        private Color _color;
+        public Color Color
+        {
+            get => _color;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _color, value);
+
+                Vector4D<float> newColor = new Vector4D<float>((float)_color.R / 255, (float)_color.G / 255, (float)_color.B / 255, (float)_color.A / 255);
+                DrawingService.SetColor(newColor);
+            }
         }
 
         public async Task LoadSTL(string file)

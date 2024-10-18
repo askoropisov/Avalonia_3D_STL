@@ -36,30 +36,11 @@ public partial class App : Application
 
         container.Register<ViewModelFactory>(Reuse.Singleton);
 
-        //container.Register(typeof(ITimerService), typeof(TimerService), Reuse.Singleton);
-
-        //Services
-        //container.RegisterMany<ConnectionService>(Reuse.Singleton);
-        //container.RegisterMany<NavigationService>(Reuse.Singleton);
-        //container.Register<DrawingService>(Reuse.Singleton);
-
         //Singleton ViewModels
 
         container.Register<MainViewModel>(Reuse.Singleton);
         container.Register<STL_ViewModel>(Reuse.Singleton);
         container.Register<MenuViewModel>(Reuse.Singleton);
-
-
-        //Singleton Classes
-        //container.Register<STL_Reader>(Reuse.Singleton);
-
-
-
-        //ViewModels
-
-
-        //Singleton models
-
 
         var resolver = new DryIocDependencyResolver(container);
         Locator.SetLocator(resolver);

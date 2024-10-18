@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia_3D_STL.Helpers;
 using Avalonia_3D_STL.Models._3D;
 using Avalonia_3D_STL.Models.Simple;
@@ -33,6 +34,7 @@ namespace Avalonia_3D_STL.Services
 
         private static Renderer Renderer = null!;
         private static Camera Camera = null!;
+        private static Vector4D<float> Color = new(1f, 0.57f, 0.0f, 0.5f);
         private static RenderPipeline SimplePipeline = null!;
         private static RenderPipeline SolidColorPipeline = null!;
         private static List<Figure> Meshes = new List<Figure>();
@@ -84,6 +86,11 @@ namespace Avalonia_3D_STL.Services
             Meshes.Clear();
         }
 
+        public static void SetColor(Vector4D<float> color)
+        {
+            Color = color;
+        }
+
         public static void Update(double deltaSeconds)
         {
             Camera.Position = cameraPosition;
@@ -114,7 +121,7 @@ namespace Avalonia_3D_STL.Services
 
                 SolidColorPipeline.SetUniform(string.Empty, new UniParameters()
                 {
-                    Color = new(1f, 0.57f, 0.0f, 0.5f)
+                    Color = Color
                 });
 
                 mesh.VertexAttributePointer((uint)SolidColorPipeline.GetAttribLocation("In_Position"), 3, nameof(Vertex.Position));

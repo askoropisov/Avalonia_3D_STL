@@ -1,6 +1,7 @@
 <UserControl
     x:Class="Avalonia_3D_STL.Views.MenuView"
     xmlns="https://github.com/avaloniaui"
+    xmlns:controls="using:Avalonia.Controls"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -16,18 +17,24 @@
         Spacing="10">
         <Button
             Name="OpenFile"
-            Width="240"
+            Width="300"
             HorizontalContentAlignment="Center"
             Content="Загрузить файл"
             FontSize="20" />
         <Button
-            Width="240"
+            Width="300"
             HorizontalContentAlignment="Center"
             Command="{Binding StartPosition}"
             Content="Начальное положение"
             FontSize="20" />
+
+        <Viewbox Width="300">
+            <ColorView ColorSpectrumShape="Ring"
+                Color="{Binding Color}"/>
+        </Viewbox>
+
         <Button
-            Width="240"
+            Width="300"
             HorizontalContentAlignment="Center"
             Command="{Binding Clear}"
             Content="Очистить"
