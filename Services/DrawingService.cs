@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Input;
-using Avalonia.Media;
 using Avalonia_3D_STL.Helpers;
 using Avalonia_3D_STL.Models._3D;
 using Avalonia_3D_STL.Models.Simple;
@@ -53,8 +52,8 @@ namespace Avalonia_3D_STL.Services
         {
             Renderer = (Renderer)args[0];
 
-            using Models._3D.Shader vs1 = new(Renderer, ShaderType.VertexShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.vert"));
-            using Models._3D.Shader fs1 = new(Renderer, ShaderType.FragmentShader, File.ReadAllText(@"C:\Code\3D\Avalonia_3D_STL\Assets\Shaders\Simple.frag"));
+            using Models._3D.Shader vs1 = new(Renderer, ShaderType.VertexShader, File.ReadAllText("Resources/Shaders/Simple.vert"));
+            using Models._3D.Shader fs1 = new(Renderer, ShaderType.FragmentShader, File.ReadAllText("Resources/Shaders/Simple.frag"));
             SimplePipeline = new RenderPipeline(Renderer, vs1, fs1);
             SolidColorPipeline = SimplePipeline;
 

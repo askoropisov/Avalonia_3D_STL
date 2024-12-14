@@ -20,7 +20,7 @@ namespace Avalonia_3D_STL.Helpers
 
         public static void GetModel(out List<Vertex> vertices, out List<uint> indices, float size = 0.5f)
         {
-            if (string.IsNullOrEmpty(FileSTL)) FileSTL = "C:\\Code\\3D\\Avalonia_3D_STL\\Assets\\Test2.STL";
+            if (string.IsNullOrEmpty(FileSTL)) FileSTL = "Resources/Test2.STL";
 
             var parser = new StlBinaryParser();
             var triangles = parser.Parse(FileSTL);

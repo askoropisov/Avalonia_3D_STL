@@ -11,8 +11,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaResource Remove="Assets\Shaders\Canvas.frag" />
-    <AvaloniaResource Remove="Assets\Shaders\Canvas.vert" />
+    <None Remove="Resources\Shaders\Canvas.frag" />
+    <None Remove="Resources\Shaders\Canvas.vert" />
+    <None Remove="Resources\Shaders\Simple.frag" />
+    <None Remove="Resources\Shaders\Simple.vert" />
+    <None Remove="Resources\Shaders\SolidColor.frag" />
+    <None Remove="Resources\Shaders\SolidColor.vert" />
+    <None Remove="Resources\Test.STL" />
+    <None Remove="Resources\Test2.STL" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,8 +36,29 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\Shaders\Canvas.vert">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="Resources\Shaders\Canvas.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Shaders\Canvas.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Shaders\Simple.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Shaders\Simple.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Shaders\SolidColor.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Shaders\SolidColor.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Test.STL">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Test2.STL">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
