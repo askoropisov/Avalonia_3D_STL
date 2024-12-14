@@ -9,7 +9,7 @@ public partial class STL_View : UserControl
     {
         InitializeComponent();
 
-        glRenderer1.OnLoad += () => { DrawingService.Load([glRenderer1]); };
+        glRenderer1.OnLoad += OnLoad;
         glRenderer1.OnUpdate += DrawingService.Update;
         glRenderer1.OnRender += DrawingService.Render;
         KeyDown += DrawingService.KeyReader;
@@ -18,5 +18,20 @@ public partial class STL_View : UserControl
         PointerMoved += DrawingService.MoveMouseButton;
         PointerReleased += DrawingService.ReleasedMouseButton;
         PointerWheelChanged += DrawingService.WheelMouse;
+
+        DrawingService.ClearChanged += DrawingService_ClearChanged;
+    }
+
+    private void OnLoad() => DrawingService.Load([glRenderer1]);
+
+
+    private void DrawingService_ClearChanged(object? sender, System.EventArgs e)
+    {
+        if (glRenderer1.Parent is Panel panel)
+        {
+            var temp = glRenderer1;
+            panel.Children.Remove(glRenderer1);
+            panel.Children.Add(temp);
+        }
     }
 }

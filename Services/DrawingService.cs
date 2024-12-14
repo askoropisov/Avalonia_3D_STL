@@ -48,6 +48,8 @@ namespace Avalonia_3D_STL.Services
         private static bool IsRightMouseButton;
         private static bool IsMiddleMouseButton;
 
+        public static event EventHandler ClearChanged;
+
         public static void Load(object[] args)
         {
             Renderer = (Renderer)args[0];
@@ -66,6 +68,12 @@ namespace Avalonia_3D_STL.Services
             Meshes.Clear();
             Meshes.Add(new(Renderer, vertices, indices));
             StartPosition();
+        }
+
+        public static void LoadNewFile()
+        {
+            ClearChanged?.Invoke(Renderer, new EventArgs());
+            LoadFile();
         }
 
         public static void StartPosition()

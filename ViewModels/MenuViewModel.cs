@@ -31,7 +31,7 @@ namespace Avalonia_3D_STL.ViewModels
         public async Task LoadSTL(string file)
         {
             STL_Reader.FileSTL = file;
-            DrawingService.LoadFile();
+            DrawingService.LoadNewFile();
         }
 
         public void Clear()
