@@ -12,7 +12,7 @@ namespace Avalonia_3D_STL.ViewModels
 
         public MenuViewModel()
         {
-
+            Drag();
         }
 
         private Color _color;
@@ -26,6 +26,43 @@ namespace Avalonia_3D_STL.ViewModels
                 Vector4D<float> newColor = new Vector4D<float>((float)_color.R / 255, (float)_color.G / 255, (float)_color.B / 255, (float)_color.A / 255);
                 DrawingService.SetColor(newColor);
             }
+        }
+        
+        private string _selectedOption;
+        public string SelectedOption
+        {
+            get => _selectedOption;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _selectedOption, value);
+            }
+        }
+        
+        public void Drag()
+        {
+            SelectedOption = "Drag";
+            DrawingService.SetOption(SelectedOption);
+        }
+
+        public void Rotate()
+        {
+            SelectedOption = "Rotate";
+            DrawingService.SetOption(SelectedOption);
+        }
+        
+        public void Zoom()
+        {
+            SelectedOption = "Zoom";
+            DrawingService.SetOption(SelectedOption);
+        }
+
+        public async void ZoomIn()
+        {
+            DrawingService.Zoom(1);
+        }
+        public async void ZoomOut()
+        {
+            DrawingService.Zoom(-1);
         }
 
         public async Task LoadSTL(string file)

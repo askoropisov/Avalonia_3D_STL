@@ -3,12 +3,14 @@ using Avalonia.Input;
 using Avalonia_3D_STL.Helpers;
 using Avalonia_3D_STL.Models._3D;
 using Avalonia_3D_STL.Models.Simple;
+using DynamicData;
 using Silk.NET.Maths;
 using Silk.NET.OpenGLES;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Avalonia_3D_STL.Services
 {
@@ -40,30 +42,39 @@ namespace Avalonia_3D_STL.Services
         private static Matrix4X4<float> Model = Matrix4X4<float>.Identity;
 
         private static Vector3D<float> cameraPosition = new Vector3D<float>(0.0f, 0.0f, 0.0f); // Начальная позиция камеры
-        private static float CameraSpeed = 1f;
+        private static float CameraSpeed = 2f;
         private static float CurrentYaw = 0f;
         private static float CurrentPitch = 0f;
 
         private static Point StartPoint;
-        private static bool IsRightMouseButton;
+        private static bool IsLeftMouseButton;
         private static bool IsMiddleMouseButton;
+        public static string Option;
 
         public static event EventHandler ClearChanged;
+        public static event EventHandler<bool> ZoomPanelChanged;
 
         public static void Load(object[] args)
         {
             Renderer = (Renderer)args[0];
 
-            using Models._3D.Shader vs1 = new(Renderer, ShaderType.VertexShader, File.ReadAllText("Resources/Shaders/Simple.vert"));
-            using Models._3D.Shader fs1 = new(Renderer, ShaderType.FragmentShader, File.ReadAllText("Resources/Shaders/Simple.frag"));
-            SimplePipeline = new RenderPipeline(Renderer, vs1, fs1);
-            SolidColorPipeline = SimplePipeline;
-
+            
             LoadFile();
+        }
+
+        public static void SetOption(string option)
+        {
+            Option = option;
+            var visible = Option == "Zoom";
+            ZoomPanelChanged?.Invoke(new object(), visible);
         }
 
         public static void LoadFile()
         {
+            using Models._3D.Shader vs1 = new(Renderer, ShaderType.VertexShader, File.ReadAllText("Resources/Shaders/Simple.vert"));
+            using Models._3D.Shader fs1 = new(Renderer, ShaderType.FragmentShader, File.ReadAllText("Resources/Shaders/Simple.frag"));
+            SimplePipeline = new RenderPipeline(Renderer, vs1, fs1);
+            SolidColorPipeline = SimplePipeline;
             STL_Reader.GetModel(out List<Vertex> vertices, out List<uint> indices);
             Meshes.Clear();
             Meshes.Add(new(Renderer, vertices, indices));
@@ -170,10 +181,17 @@ namespace Avalonia_3D_STL.Services
             switch (button)
             {
                 case PointerUpdateKind.LeftButtonPressed:
+                    StartPoint = e.GetPosition(null);
+                    if (Option == "Rotate")
+                    {
+                        IsLeftMouseButton = true;
+                    }
+                    else if (Option == "Drag")
+                    {
+                        IsMiddleMouseButton = true;
+                    }
                     break;
                 case PointerUpdateKind.RightButtonPressed:
-                    IsRightMouseButton = true;
-                    StartPoint = e.GetPosition(null);
                     break;
                 case PointerUpdateKind.MiddleButtonPressed:
                     IsMiddleMouseButton = true;
@@ -190,11 +208,11 @@ namespace Avalonia_3D_STL.Services
 
             var distance = Vector3.Distance((Vector3)cameraPosition, (Vector3)modelCenter);
             float speedFactor = MathF.Log(distance + 1);
-
-            if (IsRightMouseButton)
+            
+            if (IsLeftMouseButton)
             {
-                CurrentYaw += (float)P.X / 20000;
-                CurrentPitch += (float)P.Y / 20000;
+                CurrentYaw += (float)P.X / 12000;
+                CurrentPitch += (float)P.Y / 12000;
 
                 //Ограничения вращения по осям (оборотам)
                 //CurrentPitch = Math.Clamp(CurrentPitch, -MathF.PI, MathF.PI);
@@ -220,9 +238,16 @@ namespace Avalonia_3D_STL.Services
             switch (e.GetCurrentPoint(null).Properties.PointerUpdateKind)
             {
                 case PointerUpdateKind.LeftButtonReleased:
+                    if (Option == "Rotate")
+                    {
+                        IsLeftMouseButton = false;
+                    }
+                    else if (Option == "Drag")
+                    {
+                        IsMiddleMouseButton = false;
+                    }
                     break;
                 case PointerUpdateKind.RightButtonReleased:
-                    IsRightMouseButton = false;
                     break;
                 case PointerUpdateKind.MiddleButtonReleased:
                     IsMiddleMouseButton = false;
@@ -234,6 +259,26 @@ namespace Avalonia_3D_STL.Services
         {
             if (e.Delta.Y > 0) cameraPosition.Z -= CameraSpeed * 10;
             else cameraPosition.Z += CameraSpeed * 10;
+        }
+        
+        public static void Zoom(float val)
+        {
+            if (val > 0)
+            {
+                for (int i = 0; i < 100; i++)
+                {
+                    cameraPosition.Z -= CameraSpeed/10;
+                    Task.Delay(10);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 100; i++)
+                {
+                    cameraPosition.Z += CameraSpeed/10;
+                    Task.Delay(10);
+                }
+            }
         }
         #endregion
     }

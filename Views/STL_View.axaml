@@ -8,15 +8,51 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-
+    <!--<ScrollViewer Name="scroll">
+       
+    <Image Name="MyImage" Source="avares://Avalonia_3D_STL/Assets/avalonia-logo.ico" >        
+    </Image>
+    </ScrollViewer>-->
+    <UserControl.Styles>
+        <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="LightGray"/>
+        </Style>
+        <Style Selector="Button:pressed">
+            <Setter Property="RenderTransform" Value="scale(1)"/>
+        </Style>
+    </UserControl.Styles>
     <Button
+        Name="MyButton"
+        Background="LightGray"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
         Content="t">
-        <UniformGrid>
-            <Grid Margin="4">
-                <openGL:Renderer x:Name="glRenderer1" />
+        <Button.GestureRecognizers>
+            <PinchGestureRecognizer/>
+        </Button.GestureRecognizers>
+        <Viewbox>
+            <Grid>
+                <StackPanel Width="600" Height="600" Opacity="0" ZIndex="10" IsVisible="{Binding ZoomVisible}}">
+                    <Border ClipToBounds="True">
+                        <Image Stretch="UniformToFill"
+                                Margin="5"
+                                Name="PinchImage"
+                                Source="avares://Avalonia_3D_STL/Assets/avalonia-logo.ico">
+                            <Image.GestureRecognizers>
+                                <PinchGestureRecognizer/>
+                                <ScrollGestureRecognizer CanHorizontallyScroll="True" CanVerticallyScroll="True"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                    </Border>
+                </StackPanel>
+                <Grid Margin="4" Width="600" Height="600" Name="grid">
+                    <Grid.GestureRecognizers>
+                        <PinchGestureRecognizer/>
+
+                    </Grid.GestureRecognizers>
+                    <openGL:Renderer x:Name="glRenderer1" />
+                </Grid>
             </Grid>
-        </UniformGrid>
+        </Viewbox>
     </Button>
 </UserControl>

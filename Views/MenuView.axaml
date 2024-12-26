@@ -2,14 +2,18 @@
     x:Class="Avalonia_3D_STL.Views.MenuView"
     xmlns="https://github.com/avaloniaui"
     xmlns:controls="using:Avalonia.Controls"
+    xmlns:converter="using:Avalonia_3D_STL.Converter"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="450"
+    d:DesignHeight="700"
     d:DesignWidth="800"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <converter:StringToBoolConverter x:Key="StringToBoolConverter"/>
+    </UserControl.Resources>
 
-
+    
     <StackPanel
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
@@ -32,7 +36,28 @@
             <ColorView ColorSpectrumShape="Ring"
                 Color="{Binding Color}"/>
         </Viewbox>
-
+        <StackPanel>
+            <RadioButton Content="Перетаскивание" IsChecked="{Binding SelectedOption, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Drag}" Command="{Binding Drag}"/>
+            <RadioButton Content="Вращение" IsChecked="{Binding SelectedOption, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Rotate}" Command="{Binding Rotate}"/>
+            <RadioButton Content="Zoom" IsChecked="{Binding SelectedOption, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Zoom}" Command="{Binding Zoom}"/>
+        </StackPanel>
+        <StackPanel>
+            <TextBlock Text="Приближение"
+                       FontSize="20"
+                       HorizontalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="-" Command="{Binding ZoomOut}"
+                        Width="100"
+                        HorizontalContentAlignment="Center"
+                        HorizontalAlignment="Center"
+                        FontSize="20"/>
+                <Button Content="+" Command="{Binding ZoomIn}"
+                        Width="100"
+                        HorizontalContentAlignment="Center"
+                        HorizontalAlignment="Center"
+                        FontSize="20"/>
+            </StackPanel>
+        </StackPanel>
         <Button
             Width="300"
             HorizontalContentAlignment="Center"
